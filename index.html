@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt 设计规则 📋</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .flow-chart {
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+        }
+        
+        .prompt-card {
+            transition: all 0.3s ease;
+        }
+        
+        .prompt-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .prompt-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        
+        .prompt-content.expanded {
+            max-height: 2000px;
+        }
+        
+        .toggle-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .style-standard { 
+            background: linear-gradient(135deg, #fef3c7, #fde68a); 
+            border-color: #f59e0b;
+        }
+        .style-gossip { 
+            background: linear-gradient(135deg, #fce7f3, #fbcfe8); 
+            border-color: #ec4899;
+        }
+        .style-gaming { 
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe); 
+            border-color: #3b82f6;
+        }
+        .style-detective { 
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe); 
+            border-color: #6366f1;
+        }
+        .style-atmospheric { 
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0); 
+            border-color: #10b981;
+        }
+        
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+        }
+        
+        th:first-child {
+            border-top-left-radius: 0.5rem;
+        }
+        
+        th:last-child {
+            border-top-right-radius: 0.5rem;
+        }
+        
+        tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 0.5rem;
+        }
+        
+        tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .info-card {
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8 px-4">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-sm opacity-80 mb-1">Digital Story AI</p>
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">Prompt 设计规则 📋</h1>
+            <p class="text-base opacity-90">家庭互联网使用日志智能摘要系统</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-10">
+        
+        <!-- Section 1: 风格选择策略规则 -->
+        <section class="bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="text-3xl">🎲</span>
+                一、风格选择策略规则
+            </h2>
+            
+            <p class="text-gray-600 mb-6">根据以下规则自动判断输出风格，<strong class="text-purple-600">优先级从高到低</strong>执行：</p>
+            
+            <!-- 两栏并排布局 -->
+            <div class="grid lg:grid-cols-2 gap-6">
+                <!-- 左栏：触发规则表 -->
+                <div class="info-card">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <span>📊</span> 触发规则表
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+                                    <th class="px-3 py-2.5 text-center font-semibold w-16">优先级</th>
+                                    <th class="px-3 py-2.5 text-left font-semibold">触发条件</th>
+                                    <th class="px-3 py-2.5 text-left font-semibold w-32">输出风格</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2.5 text-center"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">P0</span></td>
+                                    <td class="px-3 py-2.5 text-gray-700">与前一天风格相同</td>
+                                    <td class="px-3 py-2.5 font-medium">强制切换 🔄</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 bg-orange-50/50">
+                                    <td class="px-3 py-2.5 text-center" rowspan="4"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-xs font-bold">P1</span></td>
+                                    <td class="px-3 py-2.5 text-gray-700">游戏时长 ≥ 1000 分钟</td>
+                                    <td class="px-3 py-2.5 font-medium">Gaming 🎮</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 bg-orange-50/50">
+                                    <td class="px-3 py-2.5 text-gray-700">01:00-08:00 家庭流量 ≥ 500MB</td>
+                                    <td class="px-3 py-2.5 font-medium">Detective 🕵️</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 bg-orange-50/50">
+                                    <td class="px-3 py-2.5 text-gray-700">流媒体流量 ≥ 3000 MB</td>
+                                    <td class="px-3 py-2.5 font-medium">Atmospheric 🌙</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 bg-orange-50/50">
+                                    <td class="px-3 py-2.5 text-gray-700">单成员流量占比 ≥ 50%</td>
+                                    <td class="px-3 py-2.5 font-medium">Gossip 🎤</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2.5 text-center"><span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">P2</span></td>
+                                    <td class="px-3 py-2.5 text-gray-700">以上均未命中</td>
+                                    <td class="px-3 py-2.5 font-medium">Standard 📔</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p class="text-sm text-amber-800">
+                            <strong>💡 说明：</strong>P1 的 4 个条件为并列关系，若命中多个则<strong>随机选择</strong>其中一个风格。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 右栏：执行逻辑流程 -->
+                <div class="info-card">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                        <span>⚙️</span> 执行逻辑流程
+                    </h3>
+                    <div class="flow-chart rounded-xl p-5 border border-gray-200 h-[calc(100%-2rem)] flex flex-col">
+                        <div class="flex flex-col items-center justify-between h-full py-2">
+                            <div class="bg-white border-2 border-purple-400 rounded-lg px-5 py-3 text-center shadow-sm w-full">
+                                <span class="text-purple-700 font-medium text-sm">📥 获取当日使用日志</span>
+                            </div>
+                            <div class="text-purple-400 text-xl">▼</div>
+                            <div class="bg-white border-2 border-indigo-400 rounded-lg px-5 py-3 text-center shadow-sm w-full">
+                                <span class="text-indigo-700 font-medium text-sm">🔍 检查前一天风格 → 加入排除列表</span>
+                            </div>
+                            <div class="text-indigo-400 text-xl">▼</div>
+                            <div class="bg-white border-2 border-blue-400 rounded-lg px-5 py-3 text-center shadow-sm w-full">
+                                <span class="text-blue-700 font-medium text-sm">🎯 判断 P1 条件命中情况（命中多个则随机选择）</span>
+                            </div>
+                            <div class="text-blue-400 text-xl">▼</div>
+                            <div class="bg-white border-2 border-green-400 rounded-lg px-5 py-3 text-center shadow-sm w-full">
+                                <span class="text-green-700 font-medium text-sm">✅ 输出最终风格</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Prompt的规则（原第三部分） -->
+        <section class="bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <span class="text-3xl">✅</span>
+                二、Prompt 的规则
+            </h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">📏</span>
+                        <h4 class="font-bold text-blue-800">输出长度</h4>
+                    </div>
+                    <p class="text-blue-700">2-4 句话，总计 ≤ 70 words</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-5 border border-yellow-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">😊</span>
+                        <h4 class="font-bold text-yellow-800">Emoji 使用</h4>
+                    </div>
+                    <p class="text-yellow-700">全部要求使用表情符号增强趣味性和可读性</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">📊</span>
+                        <h4 class="font-bold text-green-800">数据来源</h4>
+                    </div>
+                    <p class="text-green-700">统一基于【家庭互联网使用日志】（含时间、成员、设备、应用、时长、流量）</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-5 border border-red-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">🚫</span>
+                        <h4 class="font-bold text-red-800">真实性约束</h4>
+                    </div>
+                    <p class="text-red-700">不虚构 App 或行为，仅在表达风格上进行夸张</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 border border-purple-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">⚡</span>
+                        <h4 class="font-bold text-purple-800">聚焦亮点</h4>
+                    </div>
+                    <p class="text-purple-700">关注峰值、变化、对比、异常等有趣内容</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-5 border border-indigo-200">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">🧱</span>
+                        <h4 class="font-bold text-indigo-800">结构框架</h4>
+                    </div>
+                    <p class="text-indigo-700">Role → Task → Requirements → Input</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: 五种风格 Prompt 详情（原第二部分，重新设计） -->
+        <section class="bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                <span class="text-3xl">🎯</span>
+                三、五种风格 Prompt 详情
+            </h2>
+            
+            <p class="text-gray-600 mb-6">点击卡片可展开/收起完整 Prompt 内容 👇</p>
+            
+            <!-- 快速操作 -->
+            <div class="flex flex-wrap gap-3 mb-6">
+                <button onclick="expandAll()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                    📖 展开全部
+                </button>
+                <button onclick="collapseAll()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                    📕 收起全部
+                </button>
+            </div>
+            
+            <!-- Prompt Cards -->
+            <div class="space-y-4">
+                
+                <!-- Standard -->
+                <div class="prompt-card rounded-xl border-2 border-amber-300 overflow-hidden">
+                    <button onclick="togglePrompt('standard')" class="toggle-btn w-full style-standard p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl">📔</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-amber-900">Standard（温馨日记）</h3>
+                                <p class="text-sm text-amber-700 mt-0.5">温暖的家庭助手 · 写日记总结 · 温暖、平静、友好</p>
+                            </div>
+                        </div>
+                        <span id="icon-standard" class="toggle-icon text-amber-700 text-xl">▼</span>
+                    </button>
+                    <div id="prompt-standard" class="prompt-content bg-amber-50/50">
+                        <div class="p-5">
+                            <div class="grid md:grid-cols-4 gap-4 mb-4">
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <div class="text-xs text-amber-600 font-medium mb-1">🎭 角色人设</div>
+                                    <div class="text-sm text-gray-800">温暖的家庭助手</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <div class="text-xs text-amber-600 font-medium mb-1">🎯 核心任务</div>
+                                    <div class="text-sm text-gray-800">写日记总结</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <div class="text-xs text-amber-600 font-medium mb-1">🗣️ 语气风格</div>
+                                    <div class="text-sm text-gray-800">温暖、平静、友好</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                    <div class="text-xs text-amber-600 font-medium mb-1">📖 叙事视角</div>
+                                    <div class="text-sm text-gray-800">回顾式日记</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-amber-200">
+                                <h4 class="font-bold text-amber-800 mb-3">完整 Prompt</h4>
+                                <pre class="text-sm text-gray-700 leading-relaxed"><code><strong>Role:</strong> You are a warm, digital family assistant keeping a daily diary. 📔
+
+<strong>Task:</strong> From the provided 【Family Internet Usage Log】, write a short, cohesive diary entry summarizing the day.
+
+<strong>Requirements:</strong>
+• Style: Warm, cozy, and narrative. Like a gentle recap of the day's digital life.
+• Structure: Write as one single smooth paragraph.
+• Focus: The overall flow of the day (morning starts, evening relaxation). Avoid exaggerated drama.
+• Length: 2-4 sentences, total ≤ 70 words. ✅
+• Tone: Friendly, calm, helpful.
+• Use emojis between sentences to add fun.
+• Creativity: You may expand imaginatively on the data, but do not invent apps or actions. ✅
+
+<strong>Input:</strong> 【Family Internet Usage Log】</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gossip -->
+                <div class="prompt-card rounded-xl border-2 border-pink-300 overflow-hidden">
+                    <button onclick="togglePrompt('gossip')" class="toggle-btn w-full style-gossip p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl">🎤</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-pink-900">Gossip（八卦头条）</h3>
+                                <p class="text-sm text-pink-700 mt-0.5">八卦娱乐记者 · 写新闻快讯 · 夸张、戏剧化、活力</p>
+                            </div>
+                        </div>
+                        <span id="icon-gossip" class="toggle-icon text-pink-700 text-xl">▼</span>
+                    </button>
+                    <div id="prompt-gossip" class="prompt-content bg-pink-50/50">
+                        <div class="p-5">
+                            <div class="grid md:grid-cols-4 gap-4 mb-4">
+                                <div class="bg-white rounded-lg p-3 border border-pink-200">
+                                    <div class="text-xs text-pink-600 font-medium mb-1">🎭 角色人设</div>
+                                    <div class="text-sm text-gray-800">八卦娱乐记者</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-pink-200">
+                                    <div class="text-xs text-pink-600 font-medium mb-1">🎯 核心任务</div>
+                                    <div class="text-sm text-gray-800">写新闻快讯</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-pink-200">
+                                    <div class="text-xs text-pink-600 font-medium mb-1">🗣️ 语气风格</div>
+                                    <div class="text-sm text-gray-800">夸张、戏剧化、活力</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-pink-200">
+                                    <div class="text-xs text-pink-600 font-medium mb-1">📖 叙事视角</div>
+                                    <div class="text-sm text-gray-800">爆料式头条</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-pink-200">
+                                <h4 class="font-bold text-pink-800 mb-3">完整 Prompt</h4>
+                                <pre class="text-sm text-gray-700 leading-relaxed"><code><strong>Role:</strong> You are a playful family gossip reporter writing "Family Internet Headlines" for a mobile app. 🎤
+
+<strong>Task:</strong> From the provided 【Family Internet Usage Log】, write 3 short, humorous news flashes about the family's online activity.
+
+<strong>Requirements:</strong>
+• Tone: Energetic, exaggerated news style 🎤
+• Number of flashes: 3
+• Length: Each flash 2–3 sentences, all 3 flashes total ≤ 70 words ✅
+• Focus on changes and contrasts:
+  - Parents caught online at unusual times 🤫
+  - Kids consuming lots of data 🎮📉
+  - Family streaming binges
+• Highlight only the most "newsworthy" moments
+• Creativity: You may expand imaginatively on the data, but do not invent apps or actions ✅
+• Emojis allowed for humor and drama
+
+<strong>Input:</strong> 【Family Internet Usage Log】</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gaming -->
+                <div class="prompt-card rounded-xl border-2 border-blue-300 overflow-hidden">
+                    <button onclick="togglePrompt('gaming')" class="toggle-btn w-full style-gaming p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl">🎮</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-900">Gaming（游戏战报）</h3>
+                                <p class="text-sm text-blue-700 mt-0.5">游戏解说员 · 写战报播报 · 激昂、电竞风、热血</p>
+                            </div>
+                        </div>
+                        <span id="icon-gaming" class="toggle-icon text-blue-700 text-xl">▼</span>
+                    </button>
+                    <div id="prompt-gaming" class="prompt-content bg-blue-50/50">
+                        <div class="p-5">
+                            <div class="grid md:grid-cols-4 gap-4 mb-4">
+                                <div class="bg-white rounded-lg p-3 border border-blue-200">
+                                    <div class="text-xs text-blue-600 font-medium mb-1">🎭 角色人设</div>
+                                    <div class="text-sm text-gray-800">游戏解说员</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-blue-200">
+                                    <div class="text-xs text-blue-600 font-medium mb-1">🎯 核心任务</div>
+                                    <div class="text-sm text-gray-800">写战报播报</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-blue-200">
+                                    <div class="text-xs text-blue-600 font-medium mb-1">🗣️ 语气风格</div>
+                                    <div class="text-sm text-gray-800">激昂、电竞风、热血</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-blue-200">
+                                    <div class="text-xs text-blue-600 font-medium mb-1">📖 叙事视角</div>
+                                    <div class="text-sm text-gray-800">实时直播播报</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-blue-200">
+                                <h4 class="font-bold text-blue-800 mb-3">完整 Prompt</h4>
+                                <pre class="text-sm text-gray-700 leading-relaxed"><code><strong>Role:</strong> 你是一名调皮的游戏解说员，将家庭的每日互联网活动当作一场多人在线直播游戏来报道。🎮
+
+<strong>Task:</strong> 根据提供的【家庭互联网使用日志】，写 3 条游戏风格的"战报"或"任务更新"。
+
+<strong>Requirements:</strong>
+• 语气：充满活力、像游戏一样 🎮⚔️
+• 快讯数量：3 条
+• 长度：每条 2-3 句话，3 条总计 ≤ 70 字 ✅
+• 重点关注异常事件或峰值：
+  - 父母在工作时间突然"进入竞技场"
+  - 孩子们释放"数据连击"或"史诗级刷剧会"
+  - 家庭流媒体或设备群集出动
+• 创意空间：可基于数据适度发散和想象，但不虚构 App 或行为，仅在风格上进行夸张 ✅
+• 使用表情符号来增强游戏感
+
+<strong>Input:</strong> 【家庭互联网使用日志】</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detective -->
+                <div class="prompt-card rounded-xl border-2 border-indigo-300 overflow-hidden">
+                    <button onclick="togglePrompt('detective')" class="toggle-btn w-full style-detective p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl">🕵️</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-indigo-900">Detective（网络侦探）</h3>
+                                <p class="text-sm text-indigo-700 mt-0.5">数字侦探 · 写调查日志 · 专业、俏皮、逻辑性</p>
+                            </div>
+                        </div>
+                        <span id="icon-detective" class="toggle-icon text-indigo-700 text-xl">▼</span>
+                    </button>
+                    <div id="prompt-detective" class="prompt-content bg-indigo-50/50">
+                        <div class="p-5">
+                            <div class="grid md:grid-cols-4 gap-4 mb-4">
+                                <div class="bg-white rounded-lg p-3 border border-indigo-200">
+                                    <div class="text-xs text-indigo-600 font-medium mb-1">🎭 角色人设</div>
+                                    <div class="text-sm text-gray-800">数字侦探</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-indigo-200">
+                                    <div class="text-xs text-indigo-600 font-medium mb-1">🎯 核心任务</div>
+                                    <div class="text-sm text-gray-800">写调查日志</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-indigo-200">
+                                    <div class="text-xs text-indigo-600 font-medium mb-1">🗣️ 语气风格</div>
+                                    <div class="text-sm text-gray-800">专业、俏皮、逻辑性</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-indigo-200">
+                                    <div class="text-xs text-indigo-600 font-medium mb-1">📖 叙事视角</div>
+                                    <div class="text-sm text-gray-800">案件推理分析</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-indigo-200">
+                                <h4 class="font-bold text-indigo-800 mb-3">完整 Prompt</h4>
+                                <pre class="text-sm text-gray-700 leading-relaxed"><code><strong>Role:</strong> 你是一名敏锐、风趣的"数字侦探"，像分析犯罪现场一样分析家庭网络流量。🕵️‍♂️
+
+<strong>Task:</strong> 根据【家庭互联网使用日志】，编写一份简短的"每日调查日志"。
+
+<strong>Requirements:</strong>
+• 逻辑结构：输出确切的 3 个要点，遵循以下逻辑流：
+  1. 🔍 异常点 (The Anomaly)：什么很突出？（例如：峰值、静默、深夜用户）
+  2. 🎯 嫌疑人 (The Suspects)：根据数据，谁是责任人？
+  3. ⚖️ 裁决 (The Verdict)：关于真相的风趣结论或"推论"
+
+• 动态变化：不要每天死守同一种模式。改变你的"调查镜头"：
+  - 有时关注时间（例如："为什么凌晨 2 点流量很高？"）
+  - 有时关注内容（例如："游戏太多，学习为零"）
+  - 有时关注互动（例如："全家人同时陷入静默"）
+
+• 语气：专业又不失调皮，使用侦探术语（"不在场证明"、"嫌疑人"、"证据"）
+• 长度：3 个要点，总计 ≤ 70 字 ✅
+• 创意空间：可基于数据适度发散和想象，但不虚构 App 或行为 ✅
+
+<strong>Input:</strong> 【家庭互联网使用日志】</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Atmospheric -->
+                <div class="prompt-card rounded-xl border-2 border-emerald-300 overflow-hidden">
+                    <button onclick="togglePrompt('atmospheric')" class="toggle-btn w-full style-atmospheric p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-4">
+                            <span class="text-3xl">🌙</span>
+                            <div>
+                                <h3 class="text-lg font-bold text-emerald-900">Atmospheric（诗意氛围）</h3>
+                                <p class="text-sm text-emerald-700 mt-0.5">诗意说书人 · 写意境故事 · 诗意、梦幻、轻快</p>
+                            </div>
+                        </div>
+                        <span id="icon-atmospheric" class="toggle-icon text-emerald-700 text-xl">▼</span>
+                    </button>
+                    <div id="prompt-atmospheric" class="prompt-content bg-emerald-50/50">
+                        <div class="p-5">
+                            <div class="grid md:grid-cols-4 gap-4 mb-4">
+                                <div class="bg-white rounded-lg p-3 border border-emerald-200">
+                                    <div class="text-xs text-emerald-600 font-medium mb-1">🎭 角色人设</div>
+                                    <div class="text-sm text-gray-800">诗意说书人</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-emerald-200">
+                                    <div class="text-xs text-emerald-600 font-medium mb-1">🎯 核心任务</div>
+                                    <div class="text-sm text-gray-800">写意境故事</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-emerald-200">
+                                    <div class="text-xs text-emerald-600 font-medium mb-1">🗣️ 语气风格</div>
+                                    <div class="text-sm text-gray-800">诗意、梦幻、轻快</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 border border-emerald-200">
+                                    <div class="text-xs text-emerald-600 font-medium mb-1">📖 叙事视角</div>
+                                    <div class="text-sm text-gray-800">散文诗描写</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-emerald-200">
+                                <h4 class="font-bold text-emerald-800 mb-3">完整 Prompt</h4>
+                                <pre class="text-sm text-gray-700 leading-relaxed"><code><strong>Role:</strong> 你是一个充满诗意的家庭网络说书人。🌙
+
+<strong>Task:</strong> 根据提供的【家庭互联网使用日志】，创作一个关于当天网络节奏的简短、异想天开的故事。
+
+<strong>Requirements:</strong>
+• 关注点：模式、流动、互动和突然爆发，而不是详细日志
+• 风格：使用诗意和氛围语言——隐喻、节奏或俏皮的意象来传达家庭活动
+• 亮点：高亮有趣的变奏：峰值、重叠或意外的高峰
+• 语气：轻快、有趣、引人入胜，让网络的一天感觉鲜活
+• 长度：3-4 个短句，总计 ≤ 70 字 ✅
+• 创意空间：可基于数据适度发散和想象，但不虚构 App 或行为 ✅
+
+<strong>Input:</strong> 【家庭互联网使用日志】</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6 mt-10">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-sm">Prompt 设计规则 · 家庭互联网使用日志智能摘要系统</p>
+        </div>
+    </footer>
+
+    <script>
+        const promptStyles = ['standard', 'gossip', 'gaming', 'detective', 'atmospheric'];
+        
+        function togglePrompt(style) {
+            const content = document.getElementById(`prompt-${style}`);
+            const icon = document.getElementById(`icon-${style}`);
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+                
+                setTimeout(() => {
+                    content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+        
+        function expandAll() {
+            promptStyles.forEach(style => {
+                const content = document.getElementById(`prompt-${style}`);
+                const icon = document.getElementById(`icon-${style}`);
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+            });
+        }
+        
+        function collapseAll() {
+            promptStyles.forEach(style => {
+                const content = document.getElementById(`prompt-${style}`);
+                const icon = document.getElementById(`icon-${style}`);
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            });
+        }
+    </script>
+</body>
+</html>
